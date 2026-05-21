@@ -1,46 +1,15 @@
 import streamlit as st
-import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import LabelEncoder
+import pickle
+import numpy as np
 
 # -----------------------------
-# Load Dataset
+# Load Trained Model
 # -----------------------------
-diabetes = pd.read_csv("diabetes_prediction_dataset.csv")
-
-# -----------------------------
-# Encode Categorical Columns
-# -----------------------------
-le_gender = LabelEncoder()
-le_smoke = LabelEncoder()
-
-diabetes['gender'] = le_gender.fit_transform(
-    diabetes['gender'].astype(str)
-)
-
-diabetes['smoking_history'] = le_smoke.fit_transform(
-    diabetes['smoking_history'].astype(str)
-)
-
-# -----------------------------
-# Features and Target
-# -----------------------------
-X = diabetes[['gender',
-              'age',
-              'hypertension',
-              'heart_disease',
-              'smoking_history',
-              'bmi',
-              'HbA1c_level',
-              'blood_glucose_level']]
-
-y = diabetes['diabetes']
-
-# -----------------------------
-# Train Model
-# -----------------------------
-model = LinearRegression()
-model.fit(X, y)
+try:
+    model = pickle.load(open("diabetes_model.pkl", "rb"))
+except FileNotFoundError:
+    st.error("PKL model file not found")
+    st.stop()
 
 # -----------------------------
 # Streamlit UI
@@ -54,7 +23,7 @@ st.write("Enter patient details below")
 # User Inputs
 gender = st.selectbox(
     "Gender",
-    ["Female", "Male"]
+    [0, 1]
 )
 
 age = st.number_input(
@@ -74,9 +43,9 @@ heart_disease = st.selectbox(
     [0, 1]
 )
 
-smoking = st.selectbox(
+smoking_history = st.selectbox(
     "Smoking History",
-    ["never", "former", "current", "not current"]
+    [0, 1, 2, 3]
 )
 
 bmi = st.number_input(
@@ -105,24 +74,20 @@ glucose = st.number_input(
 # -----------------------------
 if st.button("Predict"):
 
-    # Encode Inputs
-    gender_val = le_gender.transform([gender])[0]
-    smoke_val = le_smoke.transform([smoking])[0]
-
-    # Prediction
-    prediction = model.predict([[
-        gender_val,
+    input_data = np.array([[
+        gender,
         age,
         hypertension,
         heart_disease,
-        smoke_val,
+        smoking_history,
         bmi,
         hba1c,
         glucose
     ]])
 
-    # Result
-    if prediction[0] >= 0.5:
+    prediction = model.predict(input_data)
+
+    if prediction[0] == 1:
         st.error("⚠️ Diabetes Detected")
     else:
         st.success("✅ No Diabetes")
