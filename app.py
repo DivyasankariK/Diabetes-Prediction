@@ -3,13 +3,9 @@ import pickle
 import numpy as np
 
 # -----------------------------
-# Load Trained Model
+# Load Model
 # -----------------------------
-try:
-    model = pickle.load(open("diabetes_model.pkl", "rb"))
-except FileNotFoundError:
-    st.error("PKL model file not found")
-    st.stop()
+model = pickle.load(open("diabetes_model.pkl", "rb"))
 
 # -----------------------------
 # Streamlit UI
@@ -20,11 +16,7 @@ st.title("🩺 Diabetes Prediction App")
 
 st.write("Enter patient details below")
 
-# User Inputs
-gender = st.selectbox(
-    "Gender",
-    [0, 1]
-)
+gender = st.selectbox("Gender", [0, 1])
 
 age = st.number_input(
     "Age",
