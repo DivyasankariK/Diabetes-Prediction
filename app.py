@@ -5,7 +5,7 @@ import numpy as np
 # -----------------------------
 # Load Model
 # -----------------------------
-model = pickle.load(open("diabetes_model.pkl", "rb"))
+model = pickle.load(open("diabetes_prediction.pkl", "rb"))
 
 # -----------------------------
 # Streamlit UI
